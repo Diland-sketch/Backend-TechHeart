@@ -16,11 +16,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUsuario;
+    @Column(nullable = false, unique = true)
+    @NotBlank(message = "La identificación es obligatoria")
+    private String identificacion;
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "El nombre de usuario es obligatorio")
@@ -38,10 +40,6 @@ public class Usuario {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol")
     private Rol rol;
-
-    @Column(nullable = false)
-    @NotBlank(message = "La identificación es obligatoria")
-    private String identificacion;
 
     @Column(nullable = false)
     @NotBlank(message = "El primer nombre es obligatorio")

@@ -36,10 +36,10 @@ public class SeguridadConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuario/login", "/api/usuario/crear", "/api/usuario/obtenerTodos").permitAll()
-                        .requestMatchers("/api/rol/**").hasRole("ADMIN")
+                        .requestMatchers("/api/rol/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/medico/**").hasRole("MEDICO")
-                        .requestMatchers("/api/paciente/**").hasRole("PACIENTE")
+                        .requestMatchers("/api/medico/**").permitAll()
+                        .requestMatchers("/api/paciente/**").permitAll()
                         .requestMatchers("/api/usuario/protegido/**").hasAnyRole("ADMIN", "MEDICO", "PACIENTE", "USER")
                         .anyRequest().authenticated()
                 )
