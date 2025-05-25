@@ -46,4 +46,8 @@ public class MedicoService {
     public void Eliminar(Medico medico){
         medicoRepository.delete(medico);
     }
+
+    public long medicosActivos(){
+        return medicoRepository.count();
+    }
 }

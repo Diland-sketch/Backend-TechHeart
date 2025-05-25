@@ -84,4 +84,9 @@ public class MedicoController {
         return ResponseEntity.ok("Eliminado con exito");
     }
 
+    @GetMapping("/medicosActivos")
+    public long contarMedicos(){
+        return medicoService.medicosActivos();
+    }
+
 }
