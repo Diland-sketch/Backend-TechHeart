@@ -89,4 +89,9 @@ public class PacienteController {
         return ResponseEntity.ok("Eliminado con exito");
     }
 
+    @GetMapping("/total")
+    public long contarPacientes(){
+        return pacienteService.contarPacientes();
+    }
+
 }

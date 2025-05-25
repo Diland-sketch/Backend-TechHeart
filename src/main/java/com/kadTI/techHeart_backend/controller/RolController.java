@@ -4,11 +4,11 @@ import com.kadTI.techHeart_backend.entity.Rol;
 import com.kadTI.techHeart_backend.service.RolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/rol")
 public class RolController {
@@ -21,5 +21,12 @@ public class RolController {
         rolService.crearRol(rol);
         return ResponseEntity.ok(rol);
     }
+
+    @GetMapping("/obtenerRoles")
+    public ResponseEntity<List<Rol>> obtenerRoles(){
+        List<Rol> roles = rolService.obtenerRoles();
+        return ResponseEntity.ok(roles);
+    }
+
 
 }

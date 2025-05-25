@@ -35,12 +35,13 @@ public class SeguridadConfig {
         http.csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/usuario/login", "/api/usuario/crear", "/api/usuario/obtenerTodos").permitAll()
+                        .requestMatchers("/api/usuario/**").permitAll()
                         .requestMatchers("/api/rol/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/medico/**").permitAll()
                         .requestMatchers("/api/paciente/**").permitAll()
-                        .requestMatchers("/api/usuario/protegido/**").hasAnyRole("ADMIN", "MEDICO", "PACIENTE", "USER")
+                        .requestMatchers("/api/dato/sesion/**").permitAll()
+                        .requestMatchers("/api/sesion/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore((Filter) jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -51,7 +52,14 @@ public class SeguridadConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // Reemplaza por tu frontend
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:5173",
+                "http://192.168.0.10", // ← agrega esto
+                "http://localhost",
+                "http://127.0.0.1",
+                "https://21e8-186-169-72-188.ngrok-free.app"
+        )); // Reemplaza por tu frontend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

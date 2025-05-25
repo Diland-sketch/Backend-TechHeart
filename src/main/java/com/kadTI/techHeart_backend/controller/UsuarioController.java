@@ -1,9 +1,6 @@
 package com.kadTI.techHeart_backend.controller;
 
-import com.kadTI.techHeart_backend.dto.LoginRequest;
-import com.kadTI.techHeart_backend.dto.LoginResponse;
-import com.kadTI.techHeart_backend.dto.RolDTO;
-import com.kadTI.techHeart_backend.dto.UsuarioDTO;
+import com.kadTI.techHeart_backend.dto.*;
 import com.kadTI.techHeart_backend.entity.Rol;
 import com.kadTI.techHeart_backend.entity.Usuario;
 import com.kadTI.techHeart_backend.security.JwtUtil;
@@ -76,9 +73,14 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/protegido")
-    public ResponseEntity<String> protegido(){
-        return ResponseEntity.ok("Acceso autorizado al endpoint protegido");
+    @GetMapping("/total")
+    public long contarUsuarios(){
+        return usuarioService.contarUsuarios();
+    }
+
+    @GetMapping("/estadisticas/registro-por-mes")
+    public ResponseEntity<List<EstadisticaMesDTO>> obtenerEstadisticas(){
+        return ResponseEntity.ok(usuarioService.obtenerUsuarioPorMes());
     }
 
 

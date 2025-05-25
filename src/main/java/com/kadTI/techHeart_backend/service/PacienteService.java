@@ -48,4 +48,8 @@ public class PacienteService {
         pacienteRepository.delete(paciente);
     }
 
+    public long contarPacientes(){
+        return pacienteRepository.count();
+    }
+
 }
