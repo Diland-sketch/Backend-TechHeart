@@ -1,7 +1,8 @@
 package com.kadTI.techHeart_backend.controller;
 
+import com.kadTI.techHeart_backend.dto.DatoRequest;
 import com.kadTI.techHeart_backend.dto.SesionHistorialDTO;
-import com.kadTI.techHeart_backend.dto.SesionRequest;
+import com.kadTI.techHeart_backend.dto.IniciarSesionRequest;
 import com.kadTI.techHeart_backend.entity.SesionECG;
 import com.kadTI.techHeart_backend.service.SesionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +20,26 @@ public class SesionController {
     SesionService sesionService;
 
     @PostMapping("/iniciar")
-    public ResponseEntity<?> inciarSesion(@RequestBody SesionRequest dto, Principal principal){
+    public ResponseEntity<?> inciarSesion(@RequestBody IniciarSesionRequest dto, Principal principal){
         SesionECG sesion = sesionService.iniciarSesion(dto.getIdPaciente(), principal.getName());
         return ResponseEntity.ok("Sesion iniciada con ID: " + sesion.getId());
     }
 
-    @PostMapping("/finalizar")
-    public ResponseEntity<?> finalizarSesion() {
-        sesionService.finalizarSesion();
+    @PostMapping("/finalizar/{idSesion}")
+    public ResponseEntity<?> finalizarSesion(@PathVariable Long idSesion) {
+        sesionService.finalizarSesion(idSesion);
         return ResponseEntity.ok("Sesión finalizada correctamente");
     }
 
-    @PostMapping("/guardar-dato")
-    public ResponseEntity<?> guardarDato(@RequestBody int valor) {
-        sesionService.guardarDatosSimulado(valor); // más adelante puedes cambiarlo a tiempo real desde ESP32
-        return ResponseEntity.ok("Dato guardado");
+    @PostMapping("/guardar-dato/{idSesion}")
+    public ResponseEntity<?> guardarDato(@PathVariable Long idSesion, @RequestBody DatoRequest datoRequest) {
+        sesionService.guardarDatoEnSesion(idSesion, datoRequest.getValor());
+        return ResponseEntity.ok("Dato guardado correctamente en la sesión " + idSesion);
     }
 
     @GetMapping("/historial/{idPaciente}")
     public ResponseEntity<List<SesionHistorialDTO>> obtenerHistorial(@PathVariable Long idPaciente) {
         return ResponseEntity.ok(sesionService.obtenerHistorial(idPaciente));
-    }
-
-    @GetMapping("/actual")
-    public ResponseEntity<?> obtenerSesionActiva() {
-        return ResponseEntity.ok(sesionService.getSesionActiva());
     }
 
     @GetMapping("/totalSesiones")

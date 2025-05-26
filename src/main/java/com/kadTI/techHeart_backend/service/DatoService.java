@@ -19,12 +19,13 @@ public class DatoService {
     @Autowired
     private SesionRepository sesionRepository;
 
+
     public void guardarDatoParaSesion(Long idSesion, DatoECGDTO dto){
         SesionECG sesionECG = sesionRepository.findById(idSesion)
                 .orElseThrow(() -> new RuntimeException("Sesion no encotrada"));
 
         DatoECG datoECG = new DatoECG();
-        datoECG.setValor(dto.getValor());
+        datoECG.setValor((dto.getValor()));
         datoECG.setTimestamp(LocalDateTime.now());
         datoECG.setSesion(sesionECG);
 
