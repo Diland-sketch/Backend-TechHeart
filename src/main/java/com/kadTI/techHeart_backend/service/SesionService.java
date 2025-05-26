@@ -81,6 +81,7 @@ public class SesionService {
                     .map(dato -> new DatoRequest(dato.getValor(), dato.getTimestamp()))
                     .toList();
 
+
             return new SesionHistorialDTO(
                     sesion.getId(),
                     sesion.getInicio(),
@@ -91,6 +92,8 @@ public class SesionService {
             );
         }).toList();
     }
+
+
 
     public SesionECG getSesionActiva() {
         return sesionActiva;

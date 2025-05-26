@@ -17,5 +17,8 @@ public class UsuarioDTO {
     private String primerApellido;
     private String segundoApellido;
     private RolDTO rol;
+    private String sexo;
+    private Integer edad;
+
 
 }

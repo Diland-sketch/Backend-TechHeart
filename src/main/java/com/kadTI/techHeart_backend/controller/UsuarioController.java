@@ -59,6 +59,9 @@ public class UsuarioController {
             usuarioDTO.setSegundoNombre(usuario.getSegundoNombre());
             usuarioDTO.setPrimerApellido(usuario.getPrimerApellido());
             usuarioDTO.setSegundoApellido(usuario.getSegundoApellido());
+            usuarioDTO.setSexo(usuario.getSexo());
+            usuarioDTO.setEdad(usuario.getEdad());
+
 
             RolDTO rolDTO = new RolDTO();
             rolDTO.setIdRol(usuario.getRol().getIdRol());
