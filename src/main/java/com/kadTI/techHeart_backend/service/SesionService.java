@@ -10,12 +10,12 @@ import com.kadTI.techHeart_backend.repository.DatoRepository;
 import com.kadTI.techHeart_backend.repository.MedicoRepository;
 import com.kadTI.techHeart_backend.repository.PacienteRepository;
 import com.kadTI.techHeart_backend.repository.SesionRepository;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import com.kadTI.techHeart_backend.websocket.ECGWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,7 +30,10 @@ public class SesionService {
     @Autowired
     private MedicoRepository medicoRepository;
 
-    private SesionECG sesionActiva;
+    private final List<Long> picosDetectados = new ArrayList<>();
+    private static final int UMBRAL_PICO = 600;
+    private static final long MIN_INTERVALO_MS = 300;
+
 
     public SesionECG iniciarSesion(Long idPaciente, String usernameMedico){
         Paciente paciente = pacienteRepository.findById(idPaciente)
@@ -39,39 +42,64 @@ public class SesionService {
         Medico medico = medicoRepository.findByNombreUsuario(usernameMedico)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
 
-        sesionActiva = new SesionECG();
-        sesionActiva.setInicio(LocalDateTime.now());
-        sesionActiva.setPaciente(paciente);
-        sesionActiva.setMedico(medico);
+        SesionECG sesion = new SesionECG();
+        sesion.setInicio(LocalDateTime.now());
+        sesion.setPaciente(paciente);
+        sesion.setMedico(medico);
 
-        return sesionRepository.save(sesionActiva);
+        return sesionRepository.save(sesion);
     }
 
-    public void guardarDatosSimulado(int valor) {
-        if(sesionActiva == null){
-            sesionActiva = new SesionECG();
-            sesionActiva.setInicio(LocalDateTime.now());
-            sesionActiva = sesionRepository.save(sesionActiva);
-        }
+    @Autowired
+    ECGWebSocketHandler ecgWebSocketHandler;
+
+    public void guardarDatoEnSesion(Long idSesion, int valor) {
+        SesionECG sesion = sesionRepository.findById(idSesion)
+                .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
 
         DatoECG dato = new DatoECG();
         dato.setValor(valor);
         dato.setTimestamp(LocalDateTime.now());
-        dato.setSesion(sesionActiva);
-
+        dato.setSesion(sesion);
         datoRepository.save(dato);
-    }
 
-    public void finalizarSesion(){
-        if (sesionActiva != null) {
-            sesionActiva.setFin(LocalDateTime.now());
-            sesionRepository.save(sesionActiva);
-            sesionActiva = null;
+        long timestampActual = System.currentTimeMillis();
+        Integer bpmCalculado = null;
+
+        if(valor > UMBRAL_PICO){
+            if(picosDetectados.isEmpty() || (timestampActual - picosDetectados.get(picosDetectados.size() - 1)) > MIN_INTERVALO_MS){
+                picosDetectados.add(timestampActual);
+
+                if(picosDetectados.size()>=2){
+                    long intervalo = timestampActual - picosDetectados.get(picosDetectados.size() - 2);
+                    bpmCalculado = (int)(60000 / intervalo);
+                }
+            }
+        }
+
+        String json;
+        if (bpmCalculado != null){
+             json = String.format("{\"valor\": %d, \"bpm\": %d, \"timestamp\": \"%s\"}", valor, bpmCalculado, dato.getTimestamp());
+        }else{
+            json = String.format("{\"valor\": %d, \"timestamp\": \"%s\"}", valor, dato.getTimestamp());
+        }
+        try{
+            ecgWebSocketHandler.enviarDatoTiempoReal(json);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al enviar dato por WebSocket: " + e.getMessage());
         }
     }
 
+    public void finalizarSesion(Long idSesion) {
+        SesionECG sesion = sesionRepository.findById(idSesion)
+                .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
+        sesion.setFin(LocalDateTime.now());
+        sesionRepository.save(sesion);
+    }
+
     public List<SesionHistorialDTO> obtenerHistorial(Long idPaciente) {
-        List<SesionECG> sesiones = sesionRepository.findAll();
+        List<SesionECG> sesiones = sesionRepository.obtenerSesionesPorPaciente(idPaciente);
 
         return sesiones.stream().map(sesion -> {
             String nombrePaciente = sesion.getPaciente().getPrimerNombre() + " " + sesion.getPaciente().getPrimerApellido();
@@ -90,10 +118,6 @@ public class SesionService {
                     datos
             );
         }).toList();
-    }
-
-    public SesionECG getSesionActiva() {
-        return sesionActiva;
     }
 
     public long totalSesiones(){
