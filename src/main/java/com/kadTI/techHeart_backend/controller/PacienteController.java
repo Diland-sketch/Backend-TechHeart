@@ -41,7 +41,6 @@ public class PacienteController {
     @PostMapping("/crear")
     public ResponseEntity<Paciente> Guardar(@RequestBody Paciente paciente) {
 
-
         if(paciente.getRol() != null && paciente.getRol().getIdRol() != null){
             Rol rol = rolService.buscarPorId(paciente.getRol().getIdRol());
             if (rol == null){
@@ -53,6 +52,11 @@ public class PacienteController {
         pacienteService.CrearPaciente(paciente);
         return ResponseEntity.ok(paciente);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Paciente> pacientePorId(@PathVariable Long id){
+        return ResponseEntity.ok(pacienteService.BuscarPaciente(id));
+    } 
 
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<String> Modificar(@PathVariable Long id, @RequestBody Paciente paciente){
