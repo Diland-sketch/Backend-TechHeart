@@ -59,7 +59,7 @@ public class PacienteController {
     } 
 
     @PutMapping("/actualizar/{id}")
-    public ResponseEntity<String> Modificar(@PathVariable Long id, @RequestBody Paciente paciente){
+    public ResponseEntity<Paciente> Modificar(@PathVariable Long id, @RequestBody Paciente paciente){
         Paciente pacienteModificado = pacienteService.BuscarPaciente(id);
         if (pacienteModificado != null){
 
@@ -72,13 +72,14 @@ public class PacienteController {
             pacienteModificado.setTipoSangre(paciente.getTipoSangre());
             pacienteModificado.setCondicionesMedicas(paciente.getCondicionesMedicas());
             pacienteModificado.setEdad(paciente.getEdad());
+            pacienteModificado.setTelefono(paciente.getTelefono());
 
-            pacienteService.Modificar(pacienteModificado);
 
 
-            return ResponseEntity.ok("modificado con exito");
+
+            return ResponseEntity.ok(pacienteService.Modificar(pacienteModificado));
         }else{
-            return ResponseEntity.ok("Paciente no encontrado");
+            return ResponseEntity.ok(paciente);
         }
 
     }

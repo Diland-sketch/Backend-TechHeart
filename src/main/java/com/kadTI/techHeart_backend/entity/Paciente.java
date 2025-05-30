@@ -25,4 +25,7 @@ public class Paciente extends Usuario{
         @Size(max = 1000, message = "Las condiciones médicas no pueden exceder 1000 caracteres")
         private String condicionesMedicas;
 
+        @Column
+        private Long telefono;
+
 }
