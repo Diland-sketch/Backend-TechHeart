@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SesionService {
@@ -96,6 +97,16 @@ public class SesionService {
 
         sesion.setFin(LocalDateTime.now());
         sesionRepository.save(sesion);
+    }
+
+    public SesionECG BuscarSesion(Long id){
+
+        Optional<SesionECG> OpcionalSesion   =  sesionRepository.findById(id);
+        if(OpcionalSesion.isPresent()){
+            SesionECG sesionECG = OpcionalSesion.get();
+            return sesionECG;
+        }
+        return null;
     }
 
     public List<SesionHistorialDTO> obtenerHistorial(Long idPaciente) {
