@@ -42,6 +42,11 @@ public class SesionController {
         return ResponseEntity.ok(sesionService.obtenerHistorial(idPaciente));
     }
 
+    @GetMapping("/{idSesion}")
+    public ResponseEntity<SesionECG> obtenerSesion(@PathVariable Long idSesion) {
+        return ResponseEntity.ok(sesionService.BuscarSesion(idSesion));
+    }
+
     @GetMapping("/totalSesiones")
     public long sesionesRealizadas(){
         return sesionService.totalSesiones();

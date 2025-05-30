@@ -20,4 +20,7 @@ public class Paciente extends Usuario{
         @Column
         private String condicionesMedicas;
 
+        @Column
+        private Long telefono;
+
 }
