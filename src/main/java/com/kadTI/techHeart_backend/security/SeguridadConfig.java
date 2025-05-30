@@ -37,11 +37,12 @@ public class SeguridadConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuario/**").permitAll()
                         .requestMatchers("/api/rol/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/medico/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/paciente/**").hasAnyRole("ADMIN", "MEDICO", "PACIENTE")
                         .requestMatchers("/api/dato/sesion/**").hasAnyRole("MEDICO", "ADMIN")
-                        .requestMatchers("/api/sesion/**").hasAnyRole("MEDICO", "ADMIN")
+                        .requestMatchers("/api/sesion/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore((Filter) jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -54,11 +55,11 @@ public class SeguridadConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://localhost:5173",
+                "http://localhost:5174",
                 "http://192.168.0.10", // ← agrega esto
                 "http://localhost",
                 "http://127.0.0.1",
-                "https://21e8-186-169-72-188.ngrok-free.app"
+                "https://9529-181-235-14-223.ngrok-free.app"
         )); // Reemplaza por tu frontend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
