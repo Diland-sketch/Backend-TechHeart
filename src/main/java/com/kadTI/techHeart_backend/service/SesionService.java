@@ -101,7 +101,7 @@ public class SesionService {
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
 
         try{
-            String ipESP32 = "192.168.1.53";
+            String ipESP32 = "192.168.12.13";
             String url = "http://" + ipESP32 + "/detener-sesion";
 
             HttpClient client = HttpClient.newHttpClient();
