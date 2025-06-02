@@ -14,6 +14,10 @@ import com.kadTI.techHeart_backend.websocket.ECGWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +59,7 @@ public class SesionService {
     ECGWebSocketHandler ecgWebSocketHandler;
 
     public void guardarDatoEnSesion(Long idSesion, int valor) {
+        System.out.println("LLEGÓ DATO: " + valor + " para sesión: " + idSesion);
         SesionECG sesion = sesionRepository.findById(idSesion)
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
 
@@ -80,9 +85,9 @@ public class SesionService {
 
         String json;
         if (bpmCalculado != null){
-             json = String.format("{\"valor\": %d, \"bpm\": %d, \"timestamp\": \"%s\"}", valor, bpmCalculado, dato.getTimestamp());
+             json = String.format("{\"valor\": %d, \"bpm\": %d }", valor, bpmCalculado);
         }else{
-            json = String.format("{\"valor\": %d, \"timestamp\": \"%s\"}", valor, dato.getTimestamp());
+            json = String.format("{\"valor\": %d }", valor);
         }
         try{
             ecgWebSocketHandler.enviarDatoTiempoReal(json);
@@ -94,6 +99,28 @@ public class SesionService {
     public void finalizarSesion(Long idSesion) {
         SesionECG sesion = sesionRepository.findById(idSesion)
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
+        try{
+            String ipESP32 = "192.168.12.13";
+            String url = "http://" + ipESP32 + "/detener-sesion";
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(HttpRequest.BodyPublishers.noBody()) // sin body
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                System.out.println("ESP32 respondió OK: " + response.body());
+            } else {
+                System.err.println("ESP32 respondió con error: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al detener sesión en ESP32: " + e.getMessage());
+            // Aquí puedes decidir si lanzar excepción o continuar
+        }
 
         sesion.setFin(LocalDateTime.now());
         sesionRepository.save(sesion);

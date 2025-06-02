@@ -37,11 +37,12 @@ public class SeguridadConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuario/**").permitAll()
                         .requestMatchers("/api/rol/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/medico/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/paciente/**").hasAnyRole("ADMIN", "MEDICO", "PACIENTE")
                         .requestMatchers("/api/dato/sesion/**").hasAnyRole("MEDICO", "ADMIN")
-                        .requestMatchers("/api/sesion/**").hasAnyRole("MEDICO", "ADMIN", "PACIENTE")
+                        .requestMatchers("/api/sesion/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore((Filter) jwtFilter, UsernamePasswordAuthenticationFilter.class);
